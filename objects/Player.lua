@@ -57,6 +57,7 @@ function Player:new(area, x, y, options)
     self.ammo_multiplier = 1
     self.boost_multiplier = 1
     self.aspd_multiplier = Stat(1)
+    self.mvspd_multiplier = Stat(1)
 
     -- Flats
     self.flat_hp = 0
@@ -66,7 +67,7 @@ function Player:new(area, x, y, options)
 
     -- Chances
     self.launch_homing_projectile_on_ammo_pickup_chance = 0
-    self.regain_hp_on_ammo_pickup_chance  = 0
+    self.regain_hp_on_ammo_pickup_chance = 0
     self.regain_hp_on_sp_pickup_chance = 0
     self.spawn_haste_area_on_hp_pickup_chance = 0
     self.spawn_haste_area_on_sp_pickup_chance = 0
@@ -75,15 +76,16 @@ function Player:new(area, x, y, options)
     self.spawn_hp_on_cycle_chance = 0
     self.regain_hp_on_cycle_chance = 0
     self.regain_full_ammo_on_cycle_chance = 0
-    self.change_attack_on_cycle_chance = 100
-    self.spawn_haste_area_on_cycle_chance = 100
-    self.barrage_on_cycle_chance = 100
-    self.launch_homing_projectile_on_cycle_chance = 100
-    self.regain_ammo_on_kill_chance = 100
-    self.launch_homing_projectile_on_kill_chance = 100
-    self.regain_boost_on_kill_chance = 100
-    self.spawn_boost_on_kill_chance = 100
-    self.gain_aspd_boost_on_kill_chance = 100
+    self.change_attack_on_cycle_chance = 0
+    self.spawn_haste_area_on_cycle_chance = 0
+    self.barrage_on_cycle_chance = 0
+    self.launch_homing_projectile_on_cycle_chance = 0
+    self.regain_ammo_on_kill_chance = 0
+    self.launch_homing_projectile_on_kill_chance = 0
+    self.regain_boost_on_kill_chance = 0
+    self.spawn_boost_on_kill_chance = 0
+    self.gain_aspd_boost_on_kill_chance = 0
+    self.mvspd_boost_on_cycle_chance = 0
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -200,7 +202,11 @@ function Player:update(dt)
     end
 
     -- Move
+    if self.mvspd_boosting then self.mvspd_multiplier:increase(50) end
+    self.mvspd_multiplier:update(dt)
+
     self.v = math.min(self.v + self.a * dt, self.max_v)
+    self.v = self.v * self.mvspd_multiplier.value
     self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
     -- Die if hit boundaries
@@ -493,17 +499,17 @@ function Player:onCycle()
     if self.chances.spawn_sp_on_cycle_chance:next() then
         self.area:addGameObject('SP')
         self.area:addGameObject('InfoText', self.x, self.y,
-            {text = 'SP Spawn!', color = skill_point_color})
+            { text = 'SP Spawn!', color = skill_point_color })
     end
     if self.chances.spawn_hp_on_cycle_chance:next() then
         self.area:addGameObject('HP')
         self.area:addGameObject('InfoText', self.x, self.y,
-            {text = 'HP Spawn!', color = hp_color})
+            { text = 'HP Spawn!', color = hp_color })
     end
     if self.chances.regain_hp_on_cycle_chance:next() then
         self:addHP(25)
         self.area:addGameObject('InfoText', self.x, self.y,
-            {text = 'Regain HP!', color = hp_color})
+            { text = 'Regain HP!', color = hp_color })
     end
     if self.chances.regain_full_ammo_on_cycle_chance:next() then
         self:addAmmo(self.max_ammo)
@@ -542,21 +548,27 @@ function Player:onCycle()
             { r = self.r, attack = 'Homing' })
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
     end
+    if self.chances.mvspd_boost_on_cycle_chance:next() then
+        self.mvspd_boosting = true
+        self.timer:after(4, function() self.mvspd_boosting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y,
+            { text = 'MVSPD Boost!', color = skill_point_color })
+    end
 end
 
 function Player:onKill()
     if self.chances.barrage_on_kill_chance:next() then
         for i = 1, 8 do
-            self.timer:after((i-1)*0.05, function()
-                local random_angle = random(-math.pi/8, math.pi/8)
-                local d = 2.2*self.w
-                self.area:addGameObject('Projectile', 
-                    self.x + d*math.cos(self.r + random_angle), 
-                    self.y + d*math.sin(self.r + random_angle), 
-                    {r = self.r + random_angle, attack = self.attack})
+            self.timer:after((i - 1) * 0.05, function()
+                local random_angle = random(-math.pi / 8, math.pi / 8)
+                local d = 2.2 * self.w
+                self.area:addGameObject('Projectile',
+                    self.x + d * math.cos(self.r + random_angle),
+                    self.y + d * math.sin(self.r + random_angle),
+                    { r = self.r + random_angle, attack = self.attack })
             end)
         end
-        self.area:addGameObject('InfoText', self.x, self.y, {text = 'Barrage!!!'})
+        self.area:addGameObject('InfoText', self.x, self.y, { text = 'Barrage!!!' })
     end
     if self.chances.regain_ammo_on_kill_chance:next() then
         self:addAmmo(20)

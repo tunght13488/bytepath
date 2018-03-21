@@ -97,6 +97,7 @@ function Player:new(area, x, y, options)
     self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
     self.drop_double_ammo_chance = 0
+    self.attack_twice_chance = 0
 
     -- Flags
     self.increased_cycle_speed_while_boosting = false
@@ -281,6 +282,9 @@ function Player:update(dt)
     if self.shoot_timer > self.shoot_cooldown * self.aspd_multiplier.value then
         self.shoot_timer = 0
         self:shoot()
+        if self.chances.attack_twice_chance:next() then
+            self:shoot()
+        end
     end
 
     -- Blink on invincible

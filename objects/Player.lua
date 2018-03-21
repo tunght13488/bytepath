@@ -61,6 +61,10 @@ function Player:new(area, x, y, options)
     self.mvspd_multiplier = Stat(1)
     self.pspd_multiplier = Stat(1)
     self.cycle_speed_multiplier = Stat(1)
+    self.luck_multiplier = 1
+    self.hp_spawn_chance_multiplier = 1
+    self.spawn_sp_chance_multiplier = 1
+    self.spawn_boost_chance_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -96,6 +100,7 @@ function Player:new(area, x, y, options)
     -- Flags
     self.increased_cycle_speed_while_boosting = false
     self.invulnerability_while_boosting = false
+    self.increased_luck_while_boosting = true
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -479,7 +484,8 @@ function Player:generateChances()
     self.chances = {}
     for k, v in pairs(self) do
         if k:find('_chance') and type(v) == 'number' then
-            self.chances[k] = chanceList({ true, math.ceil(v) }, { false, 100 - math.ceil(v) })
+            self.chances[k] = chanceList({ true, math.ceil(v * self.luck_multiplier) },
+                { false, 100 - math.ceil(v * self.luck_multiplier) })
         end
     end
 end
@@ -642,22 +648,32 @@ function Player:onBoostStart()
                 { r = self.r, attack = 'Homing' })
             self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
         end
-        if self.increased_cycle_speed_while_boosting then
-            self.cspd_boosting = true
-        end
-        if self.invulnerability_while_boosting then
-            self.invincible = true
-        end
     end, nil, 'launch_homing_projectile_while_boosting_chance')
+    if self.increased_cycle_speed_while_boosting then
+        self.cspd_boosting = true
+    end
+    if self.invulnerability_while_boosting then
+        self.invincible = true
+    end
+    if self.increased_luck_while_boosting then
+        self.luck_boosting = true
+        self.luck_multiplier = self.luck_multiplier * 2
+        self:generateChances()
+    end
 end
 
 function Player:onBoostEnd()
     self.timer:cancel('launch_homing_projectile_while_boosting_chance')
-    if self.increased_cycle_speed_while_boosting then
+    if self.increased_cycle_speed_while_boostingand and self.cspd_boosting then
         self.cspd_boosting = false
     end
-    if self.invulnerability_while_boosting then
+    if self.invulnerability_while_boosting and self.invincible then
         self.invincible = false
+    end
+    if self.increased_luck_while_boosting and self.luck_boosting then
+        self.luck_boosting = false
+        self.luck_multiplier = self.luck_multiplier / 2
+        self:generateChances()
     end
 end
 

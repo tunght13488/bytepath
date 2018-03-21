@@ -35,7 +35,10 @@ function Director:new(stage)
             { 'Shooter', love.math.random(2, 12) })
     end
 
-    self.resource_spawn_chances = chanceList({ 'Boost', 28 }, { 'HP', 14 }, { 'SP', 58 })
+    local player = current_room.player
+    self.resource_spawn_chances = chanceList({ 'Boost', 28 * player.spawn_boost_chance_multiplier },
+        { 'HP', 14 * player.hp_spawn_chance_multiplier },
+        { 'SP', 58 * player.spawn_sp_chance_multiplier })
     self.resource_duration = 16
     self.resource_timer = 0
 

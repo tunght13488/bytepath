@@ -62,7 +62,7 @@ function Player:new(area, x, y, options)
     self.pspd_multiplier = Stat(1)
     self.cycle_speed_multiplier = Stat(1)
     self.luck_multiplier = 1
-    self.hp_spawn_chance_multiplier = 1
+    self.spawn_hp_chance_multiplier = 1
     self.spawn_sp_chance_multiplier = 1
     self.spawn_boost_chance_multiplier = 1
 
@@ -96,11 +96,12 @@ function Player:new(area, x, y, options)
     self.pspd_boost_on_cycle_chance = 0
     self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
+    self.drop_double_ammo_chance = 0
 
     -- Flags
     self.increased_cycle_speed_while_boosting = false
     self.invulnerability_while_boosting = false
-    self.increased_luck_while_boosting = true
+    self.increased_luck_while_boosting = false
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -598,7 +599,7 @@ function Player:onCycle()
     end
 end
 
-function Player:onKill()
+function Player:onKill(object)
     if self.chances.barrage_on_kill_chance:next() then
         for i = 1, 8 do
             self.timer:after((i - 1) * 0.05, function()
@@ -636,6 +637,9 @@ function Player:onKill()
         self.timer:after(4, function() self.aspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'ASPD Boost!', color = ammo_color })
+    end
+    if self.chances.drop_double_ammo_chance:next() then
+        self.area:addGameObject('Ammo', object.x, object.y)
     end
 end
 

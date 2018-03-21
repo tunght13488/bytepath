@@ -88,6 +88,7 @@ function Player:new(area, x, y, options)
     self.gain_aspd_boost_on_kill_chance = 0
     self.mvspd_boost_on_cycle_chance = 0
     self.pspd_boost_on_cycle_chance = 0
+    self.pspd_inhibit_on_cycle_chance = 0
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -278,6 +279,7 @@ function Player:update(dt)
 
     -- Projectile Speed
     if self.pspd_boosting then self.pspd_multiplier:increase(100) end
+    if self.pspd_inhibiting then self.pspd_multiplier:decrease(50) end
     self.pspd_multiplier:update(dt)
 end
 
@@ -565,6 +567,12 @@ function Player:onCycle()
         self.timer:after(4, function() self.pspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'PSPD Boost!', color = skill_point_color })
+    end
+    if self.chances.pspd_inhibit_on_cycle_chance:next() then
+        self.pspd_inhibiting = true
+        self.timer:after(4, function() self.pspd_inhibiting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y,
+            { text = 'PSPD Inhibit!', color = skill_point_color })
     end
 end
 

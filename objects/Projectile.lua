@@ -5,6 +5,7 @@ function Projectile:new(area, x, y, options)
     Projectile.super.new(self, area, x, y, options)
 
     self.s = options.s or (self.attack == 'Homing' and 4 or 2.5)
+    self.s = self.s * self.parent.projectile_size_multiplier
     self.original_v = options.v or 200
     self.v = self.original_v
     self.depth = 10

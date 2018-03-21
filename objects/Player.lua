@@ -68,6 +68,7 @@ function Player:new(area, x, y, options)
     self.enemy_spawn_rate_multiplier = 1
     self.resource_spawn_rate_multiplier = 1
     self.attack_spawn_rate_multiplier = 1
+    self.turn_rate_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -172,8 +173,8 @@ function Player:update(dt)
     end
 
     -- Turn
-    if input:down('left') then self.r = self.r - self.rv * dt end
-    if input:down('right') then self.r = self.r + self.rv * dt end
+    if input:down('left') then self.r = self.r - self.rv * self.turn_rate_multiplier * dt end
+    if input:down('right') then self.r = self.r + self.rv * self.turn_rate_multiplier * dt end
 
     -- Boost
     self.max_v = self.base_max_v

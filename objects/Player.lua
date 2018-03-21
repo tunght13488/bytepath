@@ -89,6 +89,7 @@ function Player:new(area, x, y, options)
     self.mvspd_boost_on_cycle_chance = 0
     self.pspd_boost_on_cycle_chance = 0
     self.pspd_inhibit_on_cycle_chance = 0
+    self.launch_homing_projectile_while_boosting_chance = 0
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -158,6 +159,8 @@ function Player:update(dt)
     self.boost_timer = self.boost_timer + dt
     if self.boost_timer > self.boost_cooldown then self.can_boost = true end
     self.boosting = false
+    if input:pressed('up') and self.boost > 1 and self.can_boost then self:onBoostStart() end
+    if input:released('up') then self:onBoostEnd() end
     if input:down('up') and self.boost > 1 and self.can_boost then
         self.boosting = true
         self.boost = self.boost - self.boost_consumption_speed * dt
@@ -165,9 +168,12 @@ function Player:update(dt)
             self.boosting = false
             self.can_boost = false
             self.boost_timer = 0
+            self:onBoostEnd()
         end
         self.max_v = 1.5 * self.base_max_v
     end
+    if input:pressed('down') and self.boost > 1 and self.can_boost then self:onBoostStart() end
+    if input:released('down') then self:onBoostEnd() end
     if input:down('down') and self.boost > 1 and self.can_boost then
         self.boosting = true
         self.boost = self.boost - self.boost_consumption_speed * dt
@@ -176,6 +182,7 @@ function Player:update(dt)
             self.boosting = false
             self.can_boost = false
             self.boost_timer = 0
+            self:onBoostEnd()
         end
     end
 
@@ -615,6 +622,22 @@ function Player:onKill()
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'ASPD Boost!', color = ammo_color })
     end
+end
+
+function Player:onBoostStart()
+    self.timer:every(0.2, function()
+        if self.chances.launch_homing_projectile_while_boosting_chance:next() then
+            local d = 1.2 * self.w
+            self.area:addGameObject('Projectile',
+                self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
+                { r = self.r, attack = 'Homing' })
+            self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
+        end
+    end, nil, 'launch_homing_projectile_while_boosting_chance')
+end
+
+function Player:onBoostEnd()
+    self.timer:cancel('launch_homing_projectile_while_boosting_chance')
 end
 
 return Player

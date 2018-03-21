@@ -58,6 +58,11 @@ function Stage:draw()
     love.graphics.print(self.score, gw - 20, 10, 0, font_scale, font_scale, math.floor(self.font:getWidth(self.score)), self.font:getHeight() / 2)
     love.graphics.setColor(255, 255, 255)
 
+    -- SP
+    love.graphics.setColor(skill_point_color)
+    love.graphics.print(skill_points, 20, 10, 0, font_scale, font_scale, math.floor(self.font:getWidth(skill_points)), self.font:getHeight() / 2)
+    love.graphics.setColor(255, 255, 255)
+
     -- HP
     local r, g, b = unpack(hp_color)
     local hp, max_hp = self.player.hp, self.player.max_hp

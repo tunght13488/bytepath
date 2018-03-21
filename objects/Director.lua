@@ -35,15 +35,9 @@ function Director:new(stage)
             { 'Shooter', love.math.random(2, 12) })
     end
 
-    local player = current_room and current_room.player or nil
-    local chance_multiplier = {
-        boost = player and player.spawn_boost_chance_multiplier or 1,
-        hp = player and player.spawn_hp_chance_multiplier or 1,
-        sp = player and player.spawn_sp_chance_multiplier or 1,
-    }
-    self.resource_spawn_chances = chanceList({ 'Boost', 28 * chance_multiplier.boost },
-        { 'HP', 14 * chance_multiplier.hp },
-        { 'SP', 58 * chance_multiplier.sp })
+    self.resource_spawn_chances = chanceList({ 'Boost', 28 * self.stage.player.spawn_boost_chance_multiplier },
+        { 'HP', 14 * self.stage.player.spawn_hp_chance_multiplier },
+        { 'SP', 58 * self.stage.player.spawn_sp_chance_multiplier })
     self.resource_duration = 16
     self.resource_timer = 0
 
@@ -58,7 +52,7 @@ end
 function Director:update(dt)
     self.timer:update(dt)
     self.round_timer = self.round_timer + dt
-    if self.round_timer > self.round_duration then
+    if self.round_timer > self.round_duration / self.stage.player.enemy_spawn_rate_multiplier then
         self.round_timer = 0
         self.difficulty = self.difficulty + 1
         self:setEnemySpawnsForThisRound()
@@ -104,12 +98,10 @@ end
 function Director:spawnResource()
     local resource = self.resource_spawn_chances:next()
     self.stage.area:addGameObject(resource)
-    if current_room and current_room.player then
-        if resource == 'HP' and current_room.player.chances.spawn_double_hp_chance:next() then
-            self.stage.area:addGameObject(resource)
-        elseif resource == 'SP' and current_room.player.chances.spawn_double_sp_chance:next() then
-            self.stage.area:addGameObject(resource)
-        end
+    if resource == 'HP' and self.stage.player.chances.spawn_double_hp_chance:next() then
+        self.stage.area:addGameObject(resource)
+    elseif resource == 'SP' and self.stage.player.chances.spawn_double_sp_chance:next() then
+        self.stage.area:addGameObject(resource)
     end
 end
 

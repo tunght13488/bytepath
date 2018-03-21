@@ -65,6 +65,7 @@ function Player:new(area, x, y, options)
     self.spawn_hp_chance_multiplier = 1
     self.spawn_sp_chance_multiplier = 1
     self.spawn_boost_chance_multiplier = 1
+    self.enemy_spawn_rate_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -100,6 +101,7 @@ function Player:new(area, x, y, options)
     self.attack_twice_chance = 0
     self.spawn_double_hp_chance = 0
     self.spawn_double_sp_chance = 0
+    self.gain_double_sp_chance = 0
 
     -- Flags
     self.increased_cycle_speed_while_boosting = false
@@ -529,6 +531,9 @@ function Player:onSPPickup()
     if self.chances.spawn_haste_area_on_sp_pickup_chance:next() then
         self.area:addGameObject('HasteArea', self.x, self.y)
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Haste Area!', color = ammo_color })
+    end
+    if self.chances.gain_double_sp_chance:next() then
+        skill_points = skill_points + 1
     end
 end
 

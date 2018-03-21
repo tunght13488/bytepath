@@ -51,6 +51,11 @@ end
 function Projectile:update(dt)
     Projectile.super.update(self, dt)
 
+    local spd_multiplier = 1
+    if current_room and current_room.player and (not current_room.player.dead) then
+        spd_multiplier = current_room.player.pspd_multiplier.value
+    end
+
     if self.x < 0 then self:die() end
     if self.y < 0 then self:die() end
     if self.x > gw then self:die() end
@@ -81,10 +86,10 @@ function Projectile:update(dt)
             self.r = angle
             local to_target_heading = Vector(math.cos(angle), math.sin(angle)):normalized()
             local final_heading = (projectile_heading + 0.1 * to_target_heading):normalized()
-            self.collider:setLinearVelocity(self.v * final_heading.x, self.v * final_heading.y)
+            self.collider:setLinearVelocity(self.v * spd_multiplier * final_heading.x, self.v * spd_multiplier * final_heading.y)
         end
     else
-        self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
+        self.collider:setLinearVelocity(self.v * spd_multiplier * math.cos(self.r), self.v * spd_multiplier * math.sin(self.r))
     end
 
     -- Collide with Enemy

@@ -58,6 +58,7 @@ function Player:new(area, x, y, options)
     self.boost_multiplier = 1
     self.aspd_multiplier = Stat(1)
     self.mvspd_multiplier = Stat(1)
+    self.pspd_multiplier = Stat(1)
 
     -- Flats
     self.flat_hp = 0
@@ -86,6 +87,7 @@ function Player:new(area, x, y, options)
     self.spawn_boost_on_kill_chance = 0
     self.gain_aspd_boost_on_kill_chance = 0
     self.mvspd_boost_on_cycle_chance = 0
+    self.pspd_boost_on_cycle_chance = 0
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -273,6 +275,10 @@ function Player:update(dt)
     else
         self.invisible = false
     end
+
+    -- Projectile Speed
+    if self.pspd_boosting then self.pspd_multiplier:increase(100) end
+    self.pspd_multiplier:update(dt)
 end
 
 function Player:draw()
@@ -553,6 +559,12 @@ function Player:onCycle()
         self.timer:after(4, function() self.mvspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'MVSPD Boost!', color = skill_point_color })
+    end
+    if self.chances.pspd_boost_on_cycle_chance:next() then
+        self.pspd_boosting = true
+        self.timer:after(4, function() self.pspd_boosting = false end)
+        self.area:addGameObject('InfoText', self.x, self.y,
+            { text = 'PSPD Boost!', color = skill_point_color })
     end
 end
 

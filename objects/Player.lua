@@ -98,6 +98,7 @@ function Player:new(area, x, y, options)
     self.launch_homing_projectile_while_boosting_chance = 0
     self.drop_double_ammo_chance = 0
     self.attack_twice_chance = 0
+    self.spawn_double_hp_chance = 0
 
     -- Flags
     self.increased_cycle_speed_while_boosting = false

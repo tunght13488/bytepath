@@ -104,6 +104,11 @@ end
 function Director:spawnResource()
     local resource = self.resource_spawn_chances:next()
     self.stage.area:addGameObject(resource)
+    if current_room and current_room.player then
+        if resource == 'HP' and current_room.player.chances.spawn_double_hp_chance:next() then
+            self.stage.area:addGameObject(resource)
+        end
+    end
 end
 
 function Director:spawnAttack()

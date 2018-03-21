@@ -93,6 +93,9 @@ function Player:new(area, x, y, options)
     self.pspd_inhibit_on_cycle_chance = 0
     self.launch_homing_projectile_while_boosting_chance = 0
 
+    -- Flags
+    self.increased_cycle_speed_while_boosting = true
+
     self.ship = 'Fighter'
     self.polygons = {}
 
@@ -145,7 +148,7 @@ function Player:update(dt)
     Player.super.update(self, dt)
 
     -- Cycle
-    self.cycle_speed_multiplier:increase(100)
+    if self.cspd_boosting then self.cycle_speed_multiplier:increase(200) end
     self.cycle_speed_multiplier:update(dt)
     self.cycle = self.base_cycle / self.cycle_speed_multiplier.value
     self.cycle_timer = self.cycle_timer + dt
@@ -638,11 +641,15 @@ function Player:onBoostStart()
                 { r = self.r, attack = 'Homing' })
             self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
         end
+        if self.increased_cycle_speed_while_boosting then
+            self.cspd_boosting = true
+        end
     end, nil, 'launch_homing_projectile_while_boosting_chance')
 end
 
 function Player:onBoostEnd()
     self.timer:cancel('launch_homing_projectile_while_boosting_chance')
+    self.cspd_boosting = false
 end
 
 return Player

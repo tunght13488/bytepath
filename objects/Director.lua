@@ -58,7 +58,7 @@ function Director:update(dt)
         self:setEnemySpawnsForThisRound()
     end
     self.resource_timer = self.resource_timer + dt
-    if self.resource_timer > self.resource_duration then
+    if self.resource_timer > self.resource_duration / self.stage.player.resource_spawn_rate_multiplier then
         self.resource_timer = 0
         self:spawnResource()
     end

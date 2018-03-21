@@ -49,7 +49,8 @@ function Player:new(area, x, y, options)
     self.invisible_timer = 0
 
     -- Cycle
-    self.cycle = 5
+    self.base_cycle = 5
+    self.cycle = self.base_cycle
     self.cycle_timer = 0
 
     -- Multipliers
@@ -59,6 +60,7 @@ function Player:new(area, x, y, options)
     self.aspd_multiplier = Stat(1)
     self.mvspd_multiplier = Stat(1)
     self.pspd_multiplier = Stat(1)
+    self.cycle_speed_multiplier = Stat(1)
 
     -- Flats
     self.flat_hp = 0
@@ -143,6 +145,9 @@ function Player:update(dt)
     Player.super.update(self, dt)
 
     -- Cycle
+    self.cycle_speed_multiplier:increase(100)
+    self.cycle_speed_multiplier:update(dt)
+    self.cycle = self.base_cycle / self.cycle_speed_multiplier.value
     self.cycle_timer = self.cycle_timer + dt
     if self.cycle_timer > self.cycle then
         self.cycle_timer = 0

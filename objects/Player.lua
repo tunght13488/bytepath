@@ -69,6 +69,7 @@ function Player:new(area, x, y, options)
     self.resource_spawn_rate_multiplier = 1
     self.attack_spawn_rate_multiplier = 1
     self.turn_rate_multiplier = 1
+    self.boost_effectiveness_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -193,14 +194,14 @@ function Player:update(dt)
             self.boost_timer = 0
             self:onBoostEnd()
         end
-        self.max_v = 1.5 * self.base_max_v
+        self.max_v = 1.5 * self.base_max_v * self.boost_effectiveness_multiplier
     end
     if input:pressed('down') and self.boost > 1 and self.can_boost then self:onBoostStart() end
     if input:released('down') then self:onBoostEnd() end
     if input:down('down') and self.boost > 1 and self.can_boost then
         self.boosting = true
         self.boost = self.boost - self.boost_consumption_speed * dt
-        self.max_v = 0.5 * self.base_max_v
+        self.max_v = 0.5 * self.base_max_v / self.boost_effectiveness_multiplier
         if self.boost <= 1 then
             self.boosting = false
             self.can_boost = false

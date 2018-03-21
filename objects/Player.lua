@@ -73,6 +73,7 @@ function Player:new(area, x, y, options)
     self.projectile_size_multiplier = 1
     self.boost_recharge_rate_multiplier = 1
     self.invulnerability_time_multiplier = 1
+    self.ammo_consumption_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -353,13 +354,12 @@ function Player:shoot()
     local d = 1.2 * self.w
     self.area:addGameObject('ShootEffect', self.x + d * math.cos(self.r), self.y + d * math.sin(self.r), { player = self, d = d })
 
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     if self.attack == 'Neutral' then
         self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), { r = self.r, attack = self.attack, parent = self })
     elseif self.attack == 'Homing' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), { r = self.r, attack = self.attack, parent = self })
     elseif self.attack == 'Double' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
             self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
@@ -369,7 +369,6 @@ function Player:shoot()
             self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
             { r = self.r - math.pi / 12, attack = self.attack, parent = self })
     elseif self.attack == 'Triple' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r),
             self.y + 1.5 * d * math.sin(self.r),
@@ -383,20 +382,17 @@ function Player:shoot()
             self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
             { r = self.r - math.pi / 12, attack = self.attack, parent = self })
     elseif self.attack == 'Rapid' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r),
             self.y + 1.5 * d * math.sin(self.r),
             { r = self.r, attack = self.attack, parent = self })
     elseif self.attack == 'Spread' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         local dr = random(-math.pi / 8, math.pi / 8)
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + dr),
             self.y + 1.5 * d * math.sin(self.r + dr),
             { r = self.r + dr, attack = self.attack, parent = self })
     elseif self.attack == 'Back' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r),
             self.y + 1.5 * d * math.sin(self.r),
@@ -406,7 +402,6 @@ function Player:shoot()
             self.y + 1.5 * d * math.sin(self.r + math.pi),
             { r = self.r + math.pi, attack = self.attack, parent = self })
     elseif self.attack == 'Side' then
-        self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r),
             self.y + 1.5 * d * math.sin(self.r),

@@ -67,6 +67,7 @@ function Player:new(area, x, y, options)
     self.spawn_boost_chance_multiplier = 1
     self.enemy_spawn_rate_multiplier = 1
     self.resource_spawn_rate_multiplier = 1
+    self.attack_spawn_rate_multiplier = 1
 
     -- Flats
     self.flat_hp = 0

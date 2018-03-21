@@ -63,7 +63,7 @@ function Director:update(dt)
         self:spawnResource()
     end
     self.attack_timer = self.attack_timer + dt
-    if self.attack_timer > self.attack_duration then
+    if self.attack_timer > self.attack_duration / self.stage.player.attack_spawn_rate_multiplier then
         self.attack_timer = 0
         self:spawnAttack()
     end

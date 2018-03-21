@@ -94,7 +94,8 @@ function Player:new(area, x, y, options)
     self.launch_homing_projectile_while_boosting_chance = 0
 
     -- Flags
-    self.increased_cycle_speed_while_boosting = true
+    self.increased_cycle_speed_while_boosting = false
+    self.invulnerability_while_boosting = false
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -644,12 +645,20 @@ function Player:onBoostStart()
         if self.increased_cycle_speed_while_boosting then
             self.cspd_boosting = true
         end
+        if self.invulnerability_while_boosting then
+            self.invincible = true
+        end
     end, nil, 'launch_homing_projectile_while_boosting_chance')
 end
 
 function Player:onBoostEnd()
     self.timer:cancel('launch_homing_projectile_while_boosting_chance')
-    self.cspd_boosting = false
+    if self.increased_cycle_speed_while_boosting then
+        self.cspd_boosting = false
+    end
+    if self.invulnerability_while_boosting then
+        self.invincible = false
+    end
 end
 
 return Player

@@ -33,7 +33,7 @@ function Player:new(area, x, y, options)
     -- Boost
     self.max_boost = 100
     self.boost = self.max_boost
-    self.boost_recovery_spped = 10
+    self.boost_recovery_speed = 10
     self.boost_consumption_speed = 50
     self.can_boost = true
     self.boost_timer = 0
@@ -71,6 +71,7 @@ function Player:new(area, x, y, options)
     self.turn_rate_multiplier = 1
     self.boost_effectiveness_multiplier = 1
     self.projectile_size_multiplier = 1
+    self.boost_recharge_rate_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -180,7 +181,7 @@ function Player:update(dt)
 
     -- Boost
     self.max_v = self.base_max_v
-    self.boost = math.min(self.boost + self.boost_recovery_spped * dt, self.max_boost)
+    self.boost = math.min(self.boost + self.boost_recovery_speed * dt * self.boost_recharge_rate_multiplier, self.max_boost)
     self.boost_timer = self.boost_timer + dt
     if self.boost_timer > self.boost_cooldown then self.can_boost = true end
     self.boosting = false

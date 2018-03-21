@@ -72,6 +72,7 @@ function Player:new(area, x, y, options)
     self.boost_effectiveness_multiplier = 1
     self.projectile_size_multiplier = 1
     self.boost_recharge_rate_multiplier = 1
+    self.invulnerability_time_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -300,7 +301,7 @@ function Player:update(dt)
     -- Blink on invincible
     if self.invincible then
         self.invincible_timer = self.invincible_timer + dt
-        if self.invincible_timer > self.invincible_cooldown then
+        if self.invincible_timer > self.invincible_cooldown * self.invulnerability_time_multiplier then
             self.invincible = false
             self.invincible_timer = 0
         end
@@ -362,11 +363,11 @@ function Player:shoot()
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
             self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
-            { r = self.r + math.pi / 12, attack = self.attack })
+            { r = self.r + math.pi / 12, attack = self.attack, parent = self })
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r - math.pi / 12),
             self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
-            { r = self.r - math.pi / 12, attack = self.attack })
+            { r = self.r - math.pi / 12, attack = self.attack, parent = self })
     elseif self.attack == 'Triple' then
         self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
@@ -376,11 +377,11 @@ function Player:shoot()
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
             self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
-            { r = self.r + math.pi / 12, attack = self.attack })
+            { r = self.r + math.pi / 12, attack = self.attack, parent = self })
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r - math.pi / 12),
             self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
-            { r = self.r - math.pi / 12, attack = self.attack })
+            { r = self.r - math.pi / 12, attack = self.attack, parent = self })
     elseif self.attack == 'Rapid' then
         self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
@@ -393,7 +394,7 @@ function Player:shoot()
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + dr),
             self.y + 1.5 * d * math.sin(self.r + dr),
-            { r = self.r + dr, attack = self.attack })
+            { r = self.r + dr, attack = self.attack, parent = self })
     elseif self.attack == 'Back' then
         self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
@@ -403,7 +404,7 @@ function Player:shoot()
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + math.pi),
             self.y + 1.5 * d * math.sin(self.r + math.pi),
-            { r = self.r + math.pi, attack = self.attack })
+            { r = self.r + math.pi, attack = self.attack, parent = self })
     elseif self.attack == 'Side' then
         self.ammo = self.ammo - attacks[self.attack].ammo
         self.area:addGameObject('Projectile',
@@ -413,11 +414,11 @@ function Player:shoot()
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r + math.pi / 2),
             self.y + 1.5 * d * math.sin(self.r + math.pi / 2),
-            { r = self.r + math.pi / 2, attack = self.attack })
+            { r = self.r + math.pi / 2, attack = self.attack, parent = self })
         self.area:addGameObject('Projectile',
             self.x + 1.5 * d * math.cos(self.r - math.pi / 2),
             self.y + 1.5 * d * math.sin(self.r - math.pi / 2),
-            { r = self.r - math.pi / 2, attack = self.attack })
+            { r = self.r - math.pi / 2, attack = self.attack, parent = self })
     end
 
     -- Fallback to Neutral if out of ammo
@@ -510,7 +511,7 @@ function Player:onAmmoPickup()
         local d = 1.2 * self.w
         self.area:addGameObject('Projectile',
             self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-            { r = self.r, attack = 'Homing' })
+            { r = self.r, attack = 'Homing', parent = self })
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
     end
     if self.chances.regain_hp_on_ammo_pickup_chance:next() then
@@ -584,7 +585,7 @@ function Player:onCycle()
                 self.area:addGameObject('Projectile',
                     self.x + d * math.cos(self.r + random_angle),
                     self.y + d * math.sin(self.r + random_angle),
-                    { r = self.r + random_angle, attack = self.attack })
+                    { r = self.r + random_angle, attack = self.attack, parent = self })
             end)
         end
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Barrage!!!' })
@@ -593,7 +594,7 @@ function Player:onCycle()
         local d = 1.2 * self.w
         self.area:addGameObject('Projectile',
             self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-            { r = self.r, attack = 'Homing' })
+            { r = self.r, attack = 'Homing', parent = self })
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
     end
     if self.chances.mvspd_boost_on_cycle_chance:next() then
@@ -625,7 +626,7 @@ function Player:onKill(object)
                 self.area:addGameObject('Projectile',
                     self.x + d * math.cos(self.r + random_angle),
                     self.y + d * math.sin(self.r + random_angle),
-                    { r = self.r + random_angle, attack = self.attack })
+                    { r = self.r + random_angle, attack = self.attack, parent = self })
             end)
         end
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Barrage!!!' })
@@ -639,7 +640,7 @@ function Player:onKill(object)
         local d = 1.2 * self.w
         self.area:addGameObject('Projectile',
             self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-            { r = self.r, attack = 'Homing' })
+            { r = self.r, attack = 'Homing', parent = self })
         self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
     end
     if self.chances.regain_boost_on_kill_chance:next() then
@@ -666,7 +667,7 @@ function Player:onBoostStart()
             local d = 1.2 * self.w
             self.area:addGameObject('Projectile',
                 self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-                { r = self.r, attack = 'Homing' })
+                { r = self.r, attack = 'Homing', parent = self })
             self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
         end
     end, nil, 'launch_homing_projectile_while_boosting_chance')

@@ -4,8 +4,7 @@ local TrailParticle = GameObject:extend()
 function TrailParticle:new(area, x, y, options)
     TrailParticle.super.new(self, area, x, y, options)
     self.r = options.r or random(4, 6)
-    self.timer:tween(options.d or random(0.3, 0.5), self, { r = 0 }, 'linear', function() self.dead = true
-    end)
+    self.timer:tween(options.d or random(0.3, 0.5), self, { r = 0 }, 'linear', function() self.dead = true end)
     self.depth = 10
 end
 

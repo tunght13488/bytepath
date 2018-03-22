@@ -10,8 +10,8 @@ end
 function HPBar:update(dt)
     if input:down('take_damage', 0.5) then
         self.hp = math.max(self.hp - love.math.random(1, 100), 1)
-        timer:tween(0.25, self, { bar = self.hp }, 'in-out-cubic', 'take_damage')
-        timer:tween(1, self, { background = self.hp }, 'in-out-cubic', 'take_damage_background')
+        timer:tween('take_damage', 0.25, self, { bar = self.hp }, 'in-out-cubic')
+        timer:tween('take_damage_background', 1, self, { background = self.hp }, 'in-out-cubic')
     end
 end
 

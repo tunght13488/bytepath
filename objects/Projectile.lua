@@ -27,6 +27,20 @@ function Projectile:new(area, x, y, options)
                 self.y - self.s * math.sin(self.r),
                 { parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color })
         end)
+    else
+        if current_room.player.projectile_ninety_degree_change then
+            self.timer:after(0.2, function()
+                self.ninety_degree_direction = table.random({ -1, 1 })
+                self.r = self.r + self.ninety_degree_direction * math.pi / 2
+                self.timer:every('ninety_degree_first', 0.25, function()
+                    self.r = self.r - self.ninety_degree_direction * math.pi / 2
+                    self.timer:after('ninety_degree_second', 0.1, function()
+                        self.r = self.r - self.ninety_degree_direction * math.pi / 2
+                        self.ninety_degree_direction = -1 * self.ninety_degree_direction
+                    end)
+                end)
+            end)
+        end
     end
 
     self.polygons = {

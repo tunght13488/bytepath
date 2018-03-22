@@ -72,6 +72,7 @@ function Player:new(area, x, y, options)
     self.invulnerability_time_multiplier = 1
     self.ammo_consumption_multiplier = 1
     self.size_multiplier = 1
+    self.stat_boost_duration_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -113,6 +114,7 @@ function Player:new(area, x, y, options)
     self.increased_cycle_speed_while_boosting = false
     self.invulnerability_while_boosting = false
     self.increased_luck_while_boosting = false
+    self.projectile_ninety_degree_change = true
 
     self.ship = 'Fighter'
     self.polygons = {}
@@ -599,19 +601,19 @@ function Player:onCycle()
     end
     if self.chances.mvspd_boost_on_cycle_chance:next() then
         self.mvspd_boosting = true
-        self.timer:after(4, function() self.mvspd_boosting = false end)
+        self.timer:after(4 * self.stat_boost_duration_multiplier, function() self.mvspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'MVSPD Boost!', color = skill_point_color })
     end
     if self.chances.pspd_boost_on_cycle_chance:next() then
         self.pspd_boosting = true
-        self.timer:after(4, function() self.pspd_boosting = false end)
+        self.timer:after(4 * self.stat_boost_duration_multiplier, function() self.pspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'PSPD Boost!', color = skill_point_color })
     end
     if self.chances.pspd_inhibit_on_cycle_chance:next() then
         self.pspd_inhibiting = true
-        self.timer:after(4, function() self.pspd_inhibiting = false end)
+        self.timer:after(4 * self.stat_boost_duration_multiplier, function() self.pspd_inhibiting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'PSPD Inhibit!', color = skill_point_color })
     end
@@ -652,7 +654,7 @@ function Player:onKill(object)
     end
     if self.chances.gain_aspd_boost_on_kill_chance:next() then
         self.aspd_boosting = true
-        self.timer:after(4, function() self.aspd_boosting = false end)
+        self.timer:after(4 * self.stat_boost_duration_multiplier, function() self.aspd_boosting = false end)
         self.area:addGameObject('InfoText', self.x, self.y,
             { text = 'ASPD Boost!', color = ammo_color })
     end
@@ -662,7 +664,7 @@ function Player:onKill(object)
 end
 
 function Player:onBoostStart()
-    self.timer:every(0.2, function()
+    self.timer:every('launch_homing_projectile_while_boosting_chance', 0.2, function()
         if self.chances.launch_homing_projectile_while_boosting_chance:next() then
             local d = 1.2 * self.w
             self.area:addGameObject('Projectile',
@@ -670,7 +672,7 @@ function Player:onBoostStart()
                 { r = self.r, attack = 'Homing', parent = self })
             self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
         end
-    end, nil, 'launch_homing_projectile_while_boosting_chance')
+    end)
     if self.increased_cycle_speed_while_boosting then
         self.cspd_boosting = true
     end

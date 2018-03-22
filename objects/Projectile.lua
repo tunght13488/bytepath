@@ -32,9 +32,9 @@ function Projectile:new(area, x, y, options)
             self.timer:after(0.2, function()
                 self.ninety_degree_direction = table.random({ -1, 1 })
                 self.r = self.r + self.ninety_degree_direction * math.pi / 2
-                self.timer:every('ninety_degree_first', 0.25, function()
+                self.timer:every('ninety_degree_first', 0.25 / current_room.player.angle_change_frequency_multiplier, function()
                     self.r = self.r - self.ninety_degree_direction * math.pi / 2
-                    self.timer:after('ninety_degree_second', 0.1, function()
+                    self.timer:after('ninety_degree_second', 0.1 / current_room.player.angle_change_frequency_multiplier, function()
                         self.r = self.r - self.ninety_degree_direction * math.pi / 2
                         self.ninety_degree_direction = -1 * self.ninety_degree_direction
                     end)
@@ -42,7 +42,7 @@ function Projectile:new(area, x, y, options)
             end)
         end
         if current_room.player.projectile_random_degree_change then
-            self.timer:every('random_degree', 0.25, function()
+            self.timer:every('random_degree', 0.25 / current_room.player.angle_change_frequency_multiplier, function()
                 self.random_degree_direction = random(-math.pi, math.pi)
                 self.r = self.r + self.random_degree_direction
             end)

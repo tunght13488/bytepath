@@ -73,6 +73,7 @@ function Player:new(area, x, y, options)
     self.ammo_consumption_multiplier = 1
     self.size_multiplier = 1
     self.stat_boost_duration_multiplier = 1
+    self.angle_change_frequency_multiplier = 1
 
     -- Flats
     self.flat_hp = 0

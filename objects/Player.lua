@@ -74,6 +74,7 @@ function Player:new(area, x, y, options)
     self.size_multiplier = 1
     self.stat_boost_duration_multiplier = 1
     self.angle_change_frequency_multiplier = 1
+    self.projectile_waviness_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -117,6 +118,7 @@ function Player:new(area, x, y, options)
     self.increased_luck_while_boosting = false
     self.projectile_ninety_degree_change = false
     self.projectile_random_degree_change = false
+    self.wavy_projectiles = false
 
     self.ship = 'Fighter'
     self.polygons = {}

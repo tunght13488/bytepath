@@ -47,6 +47,17 @@ function Projectile:new(area, x, y, options)
                 self.r = self.r + self.random_degree_direction
             end)
         end
+        if current_room.player.wavy_projectiles then
+            local direction = table.random({ -1, 1 })
+            self.timer:tween(0.25, self, { r = self.r + direction * math.pi / 8 * current_room.player.projectile_waviness_multiplier }, 'linear', function()
+                self.timer:tween(0.25, self, { r = self.r - direction * math.pi / 4 * current_room.player.projectile_waviness_multiplier }, 'linear')
+            end)
+            self.timer:every(0.75, function()
+                self.timer:tween(0.25, self, { r = self.r + direction * math.pi / 4 * current_room.player.projectile_waviness_multiplier }, 'linear', function()
+                    self.timer:tween(0.5, self, { r = self.r - direction * math.pi / 4 * current_room.player.projectile_waviness_multiplier }, 'linear')
+                end)
+            end)
+        end
     end
 
     self.polygons = {

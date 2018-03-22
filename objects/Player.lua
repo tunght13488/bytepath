@@ -11,9 +11,6 @@ function Player:new(area, x, y, options)
     self.x, self.y = x, y
     self.w, self.h = 12, 12
     self.depth = 10
-    self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w)
-    self.collider:setObject(self)
-    self.collider:setCollisionClass('Player')
 
     -- Movement
     self.r = -math.pi / 2
@@ -74,6 +71,7 @@ function Player:new(area, x, y, options)
     self.boost_recharge_rate_multiplier = 1
     self.invulnerability_time_multiplier = 1
     self.ammo_consumption_multiplier = 1
+    self.size_multiplier = 1
 
     -- Flats
     self.flat_hp = 0
@@ -147,21 +145,28 @@ function Player:new(area, x, y, options)
     -- Trail
     self.trail_color = skill_point_color
     self.timer:every(0.01, function()
+        local d1 = 0.9 * self.w * self.size_multiplier
+        local d2 = 0.2 * self.w * self.size_multiplier
         if self.ship == 'Fighter' then
             self.area:addGameObject('TrailParticle',
-                self.x - 0.9 * self.w * math.cos(self.r) + 0.2 * self.w * math.cos(self.r - math.pi / 2),
-                self.y - 0.9 * self.w * math.sin(self.r) + 0.2 * self.w * math.sin(self.r - math.pi / 2),
-                { parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color })
+                self.x - d1 * math.cos(self.r) + d2 * math.cos(self.r - math.pi / 2),
+                self.y - d1 * math.sin(self.r) + d2 * math.sin(self.r - math.pi / 2),
+                { parent = self, r = random(2, 4), d = random(0.15, 0.25) * self.size_multiplier, color = self.trail_color })
             self.area:addGameObject('TrailParticle',
-                self.x - 0.9 * self.w * math.cos(self.r) + 0.2 * self.w * math.cos(self.r + math.pi / 2),
-                self.y - 0.9 * self.w * math.sin(self.r) + 0.2 * self.w * math.sin(self.r + math.pi / 2),
-                { parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color })
+                self.x - d1 * math.cos(self.r) + d2 * math.cos(self.r + math.pi / 2),
+                self.y - d1 * math.sin(self.r) + d2 * math.sin(self.r + math.pi / 2),
+                { parent = self, r = random(2, 4), d = random(0.15, 0.25) * self.size_multiplier, color = self.trail_color })
         end
     end)
 
     -- treeToPlayer(self)
     self:setStats()
     self:generateChances()
+
+    -- Collision
+    self.collider = self.area.world:newCircleCollider(self.x, self.y, self.w * self.size_multiplier)
+    self.collider:setObject(self)
+    self.collider:setCollisionClass('Player')
 end
 
 function Player:update(dt)
@@ -334,10 +339,10 @@ function Player:draw()
     for _, polygon in ipairs(self.polygons) do
         local points = fn.map(polygon, function(k, v)
             if k % 2 == 1 then
-                return self.x + v
+                return self.x + v * self.size_multiplier
                 -- return self.x + v + random(-1, 1)
             else
-                return self.y + v
+                return self.y + v * self.size_multiplier
                 -- return self.y + v + random(-1, 1)
             end
         end)
@@ -351,7 +356,7 @@ function Player:destroy()
 end
 
 function Player:shoot()
-    local d = 1.2 * self.w
+    local d = 1.2 * self.w * self.size_multiplier
     self.area:addGameObject('ShootEffect', self.x + d * math.cos(self.r), self.y + d * math.sin(self.r), { player = self, d = d })
 
     self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier

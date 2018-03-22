@@ -114,7 +114,8 @@ function Player:new(area, x, y, options)
     self.increased_cycle_speed_while_boosting = false
     self.invulnerability_while_boosting = false
     self.increased_luck_while_boosting = false
-    self.projectile_ninety_degree_change = true
+    self.projectile_ninety_degree_change = false
+    self.projectile_random_degree_change = false
 
     self.ship = 'Fighter'
     self.polygons = {}

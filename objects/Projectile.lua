@@ -41,6 +41,12 @@ function Projectile:new(area, x, y, options)
                 end)
             end)
         end
+        if current_room.player.projectile_random_degree_change then
+            self.timer:every('random_degree', 0.25, function()
+                self.random_degree_direction = random(-math.pi, math.pi)
+                self.r = self.r + self.random_degree_direction
+            end)
+        end
     end
 
     self.polygons = {

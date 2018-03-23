@@ -13,6 +13,7 @@ Camera = require "libraries/ModifiedCamera/camera"
 wf = require "libraries/windfield/windfield"
 Draft = require "libraries/draft/draft"
 Vector = require "libraries/hump/vector"
+lurker = require "libraries/lurker/lurker"
 
 
 function love.load()
@@ -66,6 +67,7 @@ function love.load()
 end
 
 function love.update(dt)
+    lurker.update()
     timer:update(dt * slow_amount)
     camera:update(dt * slow_amount)
     if current_room then current_room:update(dt * slow_amount) end

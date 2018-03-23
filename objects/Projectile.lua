@@ -97,6 +97,19 @@ function Projectile:new(area, x, y, options)
     end
   end
 
+  if self.attack == 'Flame' then
+    self.damage = 50
+    if not self.shield then
+      self.timer:tween(random(0.6, 1) * self.projectile_duration_multiplier, self, { v = 0 }, 'linear', function() self:die() end)
+    end
+    self.timer:every(0.05, function()
+      self.area:addGameObject('ProjectileTrail',
+        self.x,
+        self.y,
+        { r = self.r, color = self.color, s = self.s })
+    end)
+  end
+
   -- Homing shape
   self.polygons = {
     {

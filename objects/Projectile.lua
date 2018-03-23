@@ -13,6 +13,10 @@ function Projectile:new(area, x, y, options)
   self.depth = 10
   self.color = options.color or attacks[self.attack].color
   self.damage = options.damage or 100
+  self.projectile_duration_multiplier = 1
+  if self.parent and self.parent.projectile_duration_multiplier then
+    self.projectile_duration_multiplier = self.parent.projectile_duration_multiplier
+  end
 
   -- Collision
   self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
@@ -88,7 +92,7 @@ function Projectile:new(area, x, y, options)
     self.damage = 75
     self.color = table.random(negative_colors)
     if not self.shield then
-      self.timer:tween(random(0.4, 0.6), self, { v = 0 }, 'linear', function() self:die() end)
+      self.timer:tween(random(0.4, 0.6) * self.projectile_duration_multiplier, self, { v = 0 }, 'linear', function() self:die() end)
     end
   end
 
@@ -189,7 +193,7 @@ function Projectile:update(dt)
       local x, y = self.collider:getPosition()
       local dx, dy = x - self.previous_x, y - self.previous_y
       self.r = Vector(dx, dy):angleTo()
-      self.timer:after(6, function() self:die() end)
+      self.timer:after(6 * self.projectile_duration_multiplier, function() self:die() end)
     end
   end
 

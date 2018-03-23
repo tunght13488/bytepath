@@ -20,7 +20,8 @@ attacks = {
   ['Spread'] = { cooldown = 0.16, ammo = 1, abbreviation = 'Rs', color = default_color },
   ['Back'] = { cooldown = 0.32, ammo = 2, abbreviation = 'Ba', color = skill_point_color },
   ['Side'] = { cooldown = 0.32, ammo = 3, abbreviation = 'Si', color = boost_color },
-  ['Blast'] = { cooldown = 0.64, ammo = 6, abbreviation = 'W', color = default_color }
+  ['Blast'] = { cooldown = 0.64, ammo = 6, abbreviation = 'W', color = default_color },
+  ['Spin'] = { cooldown = 0.32, ammo = 2, abbreviation = 'Sp', color = hp_color },
 }
 tree = {}
 tree[2] = { 'HP', { '6% Increased HP', 'hp_multiplier', 0.06 } }

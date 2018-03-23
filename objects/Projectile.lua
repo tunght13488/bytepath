@@ -17,6 +17,7 @@ function Projectile:new(area, x, y, options)
   if self.parent and self.parent.projectile_duration_multiplier then
     self.projectile_duration_multiplier = self.parent.projectile_duration_multiplier
   end
+  self.rv = table.random({ random(-2 * math.pi, -math.pi), random(math.pi, 2 * math.pi) })
 
   -- Collision
   self.collider = self.area.world:newCircleCollider(self.x, self.y, self.s)
@@ -195,6 +196,17 @@ function Projectile:update(dt)
       self.r = Vector(dx, dy):angleTo()
       self.timer:after(6 * self.projectile_duration_multiplier, function() self:die() end)
     end
+  end
+
+  if self.attack == 'Spin' then
+    self.r = self.r + self.rv * dt
+    self.timer:after(random(2.4, 3.2), function() self:die() end)
+    self.timer:every(0.05, function()
+      self.area:addGameObject('ProjectileTrail',
+        self.x,
+        self.y,
+        { r = Vector(self.collider:getLinearVelocity()):angleTo(), color = self.color, s = self.s })
+    end)
   end
 
   self.previous_x, self.previous_y = self.collider:getPosition()

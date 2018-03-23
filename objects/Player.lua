@@ -446,6 +446,11 @@ function Player:shoot()
         table.merge({ r = self.r + random_angle, v = random(500, 600) }, mods))
     end
     camera:shake(4, 60, 0.4)
+  elseif self.attack == 'Spin' then
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * d * math.cos(self.r),
+      self.y + 1.5 * d * math.sin(self.r),
+      table.merge({ r = self.r }, mods))
   end
 
   -- Fallback to Neutral if out of ammo

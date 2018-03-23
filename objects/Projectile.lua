@@ -27,7 +27,10 @@ function Projectile:new(area, x, y, options)
         self.y - self.s * math.sin(self.r),
         { parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color })
     end)
-  else
+  end
+
+  -- Effect
+  if self.attack ~= 'Homing' then
     if current_room.player.projectile_ninety_degree_change then
       self.timer:after(0.2, function()
         self.ninety_degree_direction = table.random({ -1, 1 })
@@ -56,6 +59,18 @@ function Projectile:new(area, x, y, options)
         self.timer:tween(0.25, self, { r = self.r + direction * math.pi / 4 * current_room.player.projectile_waviness_multiplier }, 'linear', function()
           self.timer:tween(0.5, self, { r = self.r - direction * math.pi / 4 * current_room.player.projectile_waviness_multiplier }, 'linear')
         end)
+      end)
+    end
+    if current_room.player.fast_slow then
+      local initial_v = self.v
+      self.timer:tween('fast_slow_first', 0.2, self, { v = initial_v * 2 }, 'in-out-cubic', function()
+        self.timer:tween('fast_slow_second', 0.3, self, { v = initial_v / 2 }, 'linear')
+      end)
+    end
+    if current_room.player.slow_fast then
+      local initial_v = self.v
+      self.timer:tween('slow_fast_first', 0.2, self, { v = initial_v / 2 }, 'in-out-cubic', function()
+        self.timer:tween('slow_fast_second', 0.3, self, { v = initial_v * 2 }, 'linear')
       end)
     end
   end

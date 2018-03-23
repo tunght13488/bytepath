@@ -119,6 +119,8 @@ function Player:new(area, x, y, options)
   self.projectile_ninety_degree_change = false
   self.projectile_random_degree_change = false
   self.wavy_projectiles = false
+  self.fast_slow = false
+  self.slow_fast = false
 
   self.ship = 'Fighter'
   self.polygons = {}

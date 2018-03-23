@@ -436,6 +436,15 @@ function Player:shoot()
       self.x + 1.5 * d * math.cos(self.r - math.pi / 2),
       self.y + 1.5 * d * math.sin(self.r - math.pi / 2),
       table.merge({ r = self.r - math.pi / 2 }, mods))
+  elseif self.attack == 'Blast' then
+    for i = 1, 12 do
+      local random_angle = random(-math.pi / 6, math.pi / 6)
+      self.area:addGameObject('Projectile',
+        self.x + 1.5 * d * math.cos(self.r + random_angle),
+        self.y + 1.5 * d * math.sin(self.r + random_angle),
+        table.merge({ r = self.r + random_angle, v = random(500, 600) }, mods))
+    end
+    camera:shake(4, 60, 0.4)
   end
 
   -- Fallback to Neutral if out of ammo

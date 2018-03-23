@@ -84,6 +84,14 @@ function Projectile:new(area, x, y, options)
     end
   end
 
+  if self.attack == 'Blast' then
+    self.damage = 75
+    self.color = table.random(negative_colors)
+    if not self.shield then
+      self.timer:tween(random(0.4, 0.6), self, { v = 0 }, 'linear', function() self:die() end)
+    end
+  end
+
   -- Homing shape
   self.polygons = {
     {

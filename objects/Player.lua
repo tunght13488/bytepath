@@ -113,6 +113,7 @@ function Player:new(area, x, y, options)
   self.spawn_double_hp_chance = 0
   self.spawn_double_sp_chance = 0
   self.gain_double_sp_chance = 0
+  self.shield_projectile_chance = 0
 
   -- Flags
   self.increased_cycle_speed_while_boosting = false
@@ -369,66 +370,72 @@ function Player:shoot()
   local d = 1.2 * self.w * self.size_multiplier
   self.area:addGameObject('ShootEffect', self.x + d * math.cos(self.r), self.y + d * math.sin(self.r), { player = self, d = d })
 
+  local mods = {
+    parent = self,
+    attack = self.attack,
+    shield = self.chances.shield_projectile_chance:next()
+  }
+
   self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
   if self.attack == 'Neutral' then
-    self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), { r = self.r, attack = self.attack, parent = self })
+    self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), table.merge({ r = self.r }, mods))
   elseif self.attack == 'Homing' then
-    self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), { r = self.r, attack = self.attack, parent = self })
+    self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), table.merge({ r = self.r }, mods))
   elseif self.attack == 'Double' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
       self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
-      { r = self.r + math.pi / 12, attack = self.attack, parent = self })
+      table.merge({ r = self.r + math.pi / 12 }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r - math.pi / 12),
       self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
-      { r = self.r - math.pi / 12, attack = self.attack, parent = self })
+      table.merge({ r = self.r - math.pi / 12 }, mods))
   elseif self.attack == 'Triple' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
-      { r = self.r, attack = self.attack, parent = self })
+      table.merge({ r = self.r }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
       self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
-      { r = self.r + math.pi / 12, attack = self.attack, parent = self })
+      table.merge({ r = self.r + math.pi / 12 }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r - math.pi / 12),
       self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
-      { r = self.r - math.pi / 12, attack = self.attack, parent = self })
+      table.merge({ r = self.r - math.pi / 12 }, mods))
   elseif self.attack == 'Rapid' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
-      { r = self.r, attack = self.attack, parent = self })
+      table.merge({ r = self.r }, mods))
   elseif self.attack == 'Spread' then
     local dr = random(-math.pi / 8, math.pi / 8)
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + dr),
       self.y + 1.5 * d * math.sin(self.r + dr),
-      { r = self.r + dr, attack = self.attack, parent = self })
+      table.merge({ r = self.r + dr }, mods))
   elseif self.attack == 'Back' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
-      { r = self.r, attack = self.attack, parent = self })
+      table.merge({ r = self.r }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + math.pi),
       self.y + 1.5 * d * math.sin(self.r + math.pi),
-      { r = self.r + math.pi, attack = self.attack, parent = self })
+      table.merge({ r = self.r + math.pi }, mods))
   elseif self.attack == 'Side' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
-      { r = self.r, attack = self.attack, parent = self })
+      table.merge({ r = self.r }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + math.pi / 2),
       self.y + 1.5 * d * math.sin(self.r + math.pi / 2),
-      { r = self.r + math.pi / 2, attack = self.attack, parent = self })
+      table.merge({ r = self.r + math.pi / 2 }, mods))
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r - math.pi / 2),
       self.y + 1.5 * d * math.sin(self.r - math.pi / 2),
-      { r = self.r - math.pi / 2, attack = self.attack, parent = self })
+      table.merge({ r = self.r - math.pi / 2 }, mods))
   end
 
   -- Fallback to Neutral if out of ammo
@@ -521,7 +528,7 @@ function Player:onAmmoPickup()
     local d = 1.2 * self.w
     self.area:addGameObject('Projectile',
       self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-      { r = self.r, attack = 'Homing', parent = self })
+      table.merge({ r = self.r, attack = 'Homing', parent = self }, mods))
     self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
   end
   if self.chances.regain_hp_on_ammo_pickup_chance:next() then
@@ -595,7 +602,7 @@ function Player:onCycle()
         self.area:addGameObject('Projectile',
           self.x + d * math.cos(self.r + random_angle),
           self.y + d * math.sin(self.r + random_angle),
-          { r = self.r + random_angle, attack = self.attack, parent = self })
+          table.merge({ r = self.r + random_angle, attack = self.attack, parent = self }, mods))
       end)
     end
     self.area:addGameObject('InfoText', self.x, self.y, { text = 'Barrage!!!' })
@@ -604,7 +611,7 @@ function Player:onCycle()
     local d = 1.2 * self.w
     self.area:addGameObject('Projectile',
       self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-      { r = self.r, attack = 'Homing', parent = self })
+      table.merge({ r = self.r, attack = 'Homing', parent = self }, mods))
     self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
   end
   if self.chances.mvspd_boost_on_cycle_chance:next() then
@@ -636,7 +643,7 @@ function Player:onKill(object)
         self.area:addGameObject('Projectile',
           self.x + d * math.cos(self.r + random_angle),
           self.y + d * math.sin(self.r + random_angle),
-          { r = self.r + random_angle, attack = self.attack, parent = self })
+          table.merge({ r = self.r + random_angle, attack = self.attack, parent = self }, mods))
       end)
     end
     self.area:addGameObject('InfoText', self.x, self.y, { text = 'Barrage!!!' })
@@ -650,7 +657,7 @@ function Player:onKill(object)
     local d = 1.2 * self.w
     self.area:addGameObject('Projectile',
       self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-      { r = self.r, attack = 'Homing', parent = self })
+      table.merge({ r = self.r, attack = 'Homing', parent = self }, mods))
     self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
   end
   if self.chances.regain_boost_on_kill_chance:next() then
@@ -677,7 +684,7 @@ function Player:onBoostStart()
       local d = 1.2 * self.w
       self.area:addGameObject('Projectile',
         self.x + d * math.cos(self.r), self.y + d * math.sin(self.r),
-        { r = self.r, attack = 'Homing', parent = self })
+        table.merge({ r = self.r, attack = 'Homing', parent = self }, mods))
       self.area:addGameObject('InfoText', self.x, self.y, { text = 'Homing Projectile!' })
     end
   end)

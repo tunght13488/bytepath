@@ -27,10 +27,6 @@ function UUID()
   return (("xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"):gsub("[xy]", fn))
 end
 
-function table.pack(...)
-  return { n = select("#", ...), ... }
-end
-
 function pinspect(...)
   print(inspect(...))
 end
@@ -137,6 +133,10 @@ function flashS(seconds)
   flash_seconds = seconds
 end
 
+function table.pack(...)
+  return { n = select("#", ...), ... }
+end
+
 function table.random(t)
   return t[love.math.random(1, #t)]
 end
@@ -162,6 +162,13 @@ end
 function table.randomp(t)
   local k = table.random(table.keys(t))
   return k, t[k]
+end
+
+function table.merge(t1, t2)
+  local new_table = {}
+  for k, v in pairs(t1) do new_table[k] = v end
+  for k, v in pairs(t2) do new_table[k] = v end
+  return new_table
 end
 
 function rectangle_overlap(ax1, ax2, ay1, ay2, bx1, bx2, by1, by2)

@@ -5,7 +5,9 @@ function Projectile:new(area, x, y, options)
   Projectile.super.new(self, area, x, y, options)
 
   self.s = options.s or (self.attack == 'Homing' and 4 or 2.5)
-  self.s = self.s * self.parent.projectile_size_multiplier
+  if self.parent and self.parent.projectile_size_multiplier then
+    self.s = self.s * self.parent.projectile_size_multiplier
+  end
   self.original_v = options.v or 200
   self.v = self.original_v
   self.depth = 10
@@ -73,8 +75,16 @@ function Projectile:new(area, x, y, options)
         self.timer:tween('slow_fast_second', 0.3, self, { v = initial_v * 2 * current_room.player.projectile_acceleration_multiplier }, 'linear')
       end)
     end
+    if self.shield then
+      self.orbit_distance = random(32, 64)
+      self.orbit_speed = random(-6, 6)
+      self.orbit_offset = random(0, 2 * math.pi)
+      self.invisible = true
+      self.timer:after(0.05, function() self.invisible = false end)
+    end
   end
 
+  -- Homing shape
   self.polygons = {
     {
       color = default_color,
@@ -93,10 +103,14 @@ function Projectile:new(area, x, y, options)
       },
     },
   }
+
+  self.time = 0
+  self.previous_x, self.previous_y = self.collider:getPosition()
 end
 
 function Projectile:update(dt)
   Projectile.super.update(self, dt)
+  self.time = self.time + dt
 
   local spd_multiplier = 1
   if current_room and current_room.player and (not current_room.player.dead) then
@@ -159,10 +173,24 @@ function Projectile:update(dt)
   --     self:die()
   --     object:die()
   -- end
+
+  if self.attack ~= 'Homing' then
+    if self.shield then
+      self.collider:setPosition(self.parent.x + self.orbit_distance * math.cos(self.orbit_speed * self.time + self.orbit_offset),
+        self.parent.y + self.orbit_distance * math.sin(self.orbit_speed * self.time + self.orbit_offset))
+      local x, y = self.collider:getPosition()
+      local dx, dy = x - self.previous_x, y - self.previous_y
+      self.r = Vector(dx, dy):angleTo()
+      self.timer:after(6, function() self:die() end)
+    end
+  end
+
+  self.previous_x, self.previous_y = self.collider:getPosition()
 end
 
 function Projectile:draw()
   Projectile.super.draw(self)
+  if self.invisible then return end
   if self.attack == 'Homing' then
     pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo())
     -- love.graphics.setColor(self.color)

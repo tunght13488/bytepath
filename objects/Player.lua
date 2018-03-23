@@ -75,6 +75,8 @@ function Player:new(area, x, y, options)
   self.stat_boost_duration_multiplier = 1
   self.angle_change_frequency_multiplier = 1
   self.projectile_waviness_multiplier = 1
+  self.projectile_acceleration_multiplier = 1
+  self.projectile_deceleration_multiplier = 1
 
   -- Flats
   self.flat_hp = 0

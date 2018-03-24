@@ -467,6 +467,11 @@ function Player:shoot()
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r }, mods))
+  elseif self.attack == '4Split' then
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * d * math.cos(self.r),
+      self.y + 1.5 * d * math.sin(self.r),
+      table.merge({ r = self.r }, mods))
   end
 
   -- Fallback to Neutral if out of ammo

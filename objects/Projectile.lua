@@ -6,11 +6,11 @@ function Projectile:new(area, x, y, options)
 
   -- Shape
   self.is_polygon = false
-  if self.attack == 'Homing' or self.attack == '2Split' then
+  if self.attack == 'Homing' or self.attack == '2Split' or self.attack == '4Split' then
     self.is_polygon = true
   end
   self.has_trail = false
-  if self.attack == 'Homing' or self.attack == '2Split' then
+  if self.attack == 'Homing' or self.attack == '2Split' or self.attack == '4Split' then
     self.has_trail = true
   end
 
@@ -331,7 +331,10 @@ function Projectile:onHit()
   if self.y > gh then
     base_r = -math.pi / 2
   end
-  local r1, r2 = base_r + math.pi / 4, base_r - math.pi / 4
+  local r1 = base_r + math.pi / 4
+  local r2 = base_r - math.pi / 4
+  local r3 = base_r + 3 * math.pi / 4
+  local r4 = base_r - 3 * math.pi / 4
   if self.attack == '2Split' then
     self.area:addGameObject('Projectile',
       self.x + 1.5 * math.cos(r1),
@@ -341,6 +344,23 @@ function Projectile:onHit()
       self.x + 1.5 * math.cos(r2),
       self.y + 1.5 * math.sin(r2),
       table.merge({ r = r2 }, mods))
+  elseif self.attack == '4Split' then
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r1),
+      self.y + 1.5 * math.sin(r1),
+      table.merge({ r = r1 }, mods))
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r2),
+      self.y + 1.5 * math.sin(r2),
+      table.merge({ r = r2 }, mods))
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r3),
+      self.y + 1.5 * math.sin(r3),
+      table.merge({ r = r3 }, mods))
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r4),
+      self.y + 1.5 * math.sin(r4),
+      table.merge({ r = r4 }, mods))
   end
 end
 

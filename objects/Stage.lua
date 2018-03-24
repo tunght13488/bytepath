@@ -118,7 +118,7 @@ function Stage:destroy()
 end
 
 function Stage:finish()
-  timer:after(1, function()
+  timer:after(1.5, function()
     gotoRoom('Stage', 'stage_room')
   end)
 end

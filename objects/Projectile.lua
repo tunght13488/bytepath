@@ -4,13 +4,14 @@ local Projectile = GameObject:extend()
 function Projectile:new(area, x, y, options)
   Projectile.super.new(self, area, x, y, options)
 
-  -- Shape
   self.is_polygon = false
-  if self.attack == 'Homing' or self.attack == '2Split' or self.attack == '4Split' then
-    self.is_polygon = true
-  end
   self.has_trail = false
-  if self.attack == 'Homing' or self.attack == '2Split' or self.attack == '4Split' then
+  if self.attack == 'Homing'
+    or self.attack == '2Split'
+    or self.attack == '4Split'
+    or self.attack == 'Explode'
+  then
+    self.is_polygon = true
     self.has_trail = true
   end
 
@@ -310,7 +311,24 @@ end
 
 function Projectile:die()
   self.dead = true
-  self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, { color = hp_color, w = 3 * self.s })
+  if self.attack == 'Explode' then
+    self.area:addGameObject('ExplodeEffect', self.x, self.y, { color = hp_color, w = 3 * self.s })
+    for i = 1, love.math.random(8, 12) do
+      self.area:addGameObject('ExplodeParticle', self.x, self.y, { s = 3, color = hp_color })
+    end
+    local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
+      for _, enemy in ipairs(enemies) do
+        if e:is(_G[enemy]) and (distance(e.x, e.y, self.x, self.y) < 12 * self.s) then
+          return true
+        end
+      end
+    end)
+    for _, enemy in ipairs(nearby_enemies) do
+      enemy:die()
+    end
+  else
+    self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, { color = hp_color, w = 3 * self.s })
+  end
 end
 
 function Projectile:onHit()

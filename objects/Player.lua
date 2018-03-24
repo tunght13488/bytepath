@@ -234,7 +234,7 @@ function Player:update(dt)
   -- Toggle homing attack
   if input:released('toggle_attack') then
     if self.attack == 'Neutral' then
-      self:setAttack('Lightning')
+      self:setAttack(toggle_attack)
     else
       self:setAttack('Neutral')
     end
@@ -351,10 +351,10 @@ function Player:draw()
   for _, polygon in ipairs(self.polygons) do
     local points = fn.map(polygon, function(k, v)
       if k % 2 == 1 then
-        return self.x + v * self.size_multiplier
+        return self.x + v * self.size_multiplier + random(-1, 1)
         -- return self.x + v + random(-1, 1)
       else
-        return self.y + v * self.size_multiplier
+        return self.y + v * self.size_multiplier + random(-1, 1)
         -- return self.y + v + random(-1, 1)
       end
     end)
@@ -518,6 +518,12 @@ function Player:shoot()
       --   local x2, y2 = self.x + 88 * math.cos(self.r), self.y + 88 * math.sin(self.r)
       --   self.area:addGameObject('LightningLine', 0, 0, { x1 = x1, y1 = y1, x2 = x2, y2 = y2 })
     end
+  elseif self.attack == 'Explode' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * d * math.cos(self.r),
+      self.y + 1.5 * d * math.sin(self.r),
+      table.merge({ r = self.r }, mods))
   end
 
   -- Fallback to Neutral if out of ammo

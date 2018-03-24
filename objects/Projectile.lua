@@ -4,7 +4,17 @@ local Projectile = GameObject:extend()
 function Projectile:new(area, x, y, options)
   Projectile.super.new(self, area, x, y, options)
 
-  self.s = options.s or (self.attack == 'Homing' and 4 or 2.5)
+  -- Shape
+  self.is_polygon = false
+  if self.attack == 'Homing' or self.attack == '2Split' then
+    self.is_polygon = true
+  end
+  self.has_trail = false
+  if self.attack == 'Homing' or self.attack == '2Split' then
+    self.has_trail = true
+  end
+
+  self.s = options.s or (self.is_polygon and 4 or 2.5)
   if self.parent and self.parent.projectile_size_multiplier then
     self.s = self.s * self.parent.projectile_size_multiplier
   end
@@ -26,13 +36,13 @@ function Projectile:new(area, x, y, options)
   self.collider:setLinearVelocity(self.v * math.cos(self.r), self.v * math.sin(self.r))
 
   -- Trail
-  self.trail_color = skill_point_color
-  if self.attack == 'Homing' then
+  if self.has_trail then
+    self.trail_color = self.color
     self.timer:every(0.01, function()
       self.area:addGameObject('TrailParticle',
         self.x - self.s * math.cos(self.r),
         self.y - self.s * math.sin(self.r),
-        { parent = self, r = random(2, 4), d = random(0.15, 0.25), color = self.trail_color })
+        { parent = self, r = random(1.5, 3), d = random(0.15, 0.25), color = self.trail_color })
     end)
   end
 
@@ -110,7 +120,7 @@ function Projectile:new(area, x, y, options)
     end)
   end
 
-  -- Homing shape
+  -- Polygon shape
   self.polygons = {
     {
       color = default_color,
@@ -157,10 +167,22 @@ function Projectile:update(dt)
       self.bounce = self.bounce - 1
     end
   else
-    if self.x < 0 then self:die() end
-    if self.y < 0 then self:die() end
-    if self.x > gw then self:die() end
-    if self.y > gh then self:die() end
+    if self.x < 0 then
+      self:die()
+      self:onHit()
+    end
+    if self.y < 0 then
+      self:die()
+      self:onHit()
+    end
+    if self.x > gw then
+      self:die()
+      self:onHit()
+    end
+    if self.y > gh then
+      self:die()
+      self:onHit()
+    end
   end
 
   if self.attack == 'Spread' then
@@ -207,6 +229,7 @@ function Projectile:update(dt)
     if object then
       object:hit(self.damage)
       self:die()
+      self:onHit()
       if object.hp <= 0 then
         current_room.player:onKill(object)
       end
@@ -250,7 +273,7 @@ function Projectile:draw()
   Projectile.super.draw(self)
   if self.invisible then return end
   pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo())
-  if self.attack == 'Homing' then
+  if self.is_polygon then
     -- love.graphics.setColor(self.color)
     -- draft:triangleRight(self.x, self.y, self.s, self.s, 'fill')
     -- draft:rhombus(self.x, self.y, self.s, self.s, 'fill')
@@ -288,6 +311,37 @@ end
 function Projectile:die()
   self.dead = true
   self.area:addGameObject('ProjectileDeathEffect', self.x, self.y, { color = hp_color, w = 3 * self.s })
+end
+
+function Projectile:onHit()
+  local mods = {
+    attack = 'Neutral',
+    color = self.color
+  }
+  local base_r = self.r
+  if self.x < 0 then
+    base_r = 0
+  end
+  if self.y < 0 then
+    base_r = math.pi / 2
+  end
+  if self.x > gw then
+    base_r = math.pi
+  end
+  if self.y > gh then
+    base_r = -math.pi / 2
+  end
+  local r1, r2 = base_r + math.pi / 4, base_r - math.pi / 4
+  if self.attack == '2Split' then
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r1),
+      self.y + 1.5 * math.sin(r1),
+      table.merge({ r = r1 }, mods))
+    self.area:addGameObject('Projectile',
+      self.x + 1.5 * math.cos(r2),
+      self.y + 1.5 * math.sin(r2),
+      table.merge({ r = r2 }, mods))
+  end
 end
 
 return Projectile

@@ -22,7 +22,8 @@ attacks = {
   ['Side'] = { cooldown = 0.32, ammo = 3, abbreviation = 'Si', color = boost_color },
   ['Blast'] = { cooldown = 0.64, ammo = 6, abbreviation = 'W', color = default_color },
   ['Spin'] = { cooldown = 0.32, ammo = 2, abbreviation = 'Sp', color = hp_color },
-  ['Flame'] = { cooldown = 0.048, ammo = 0.4, abbreviation = 'F', color = skill_point_color }
+  ['Flame'] = { cooldown = 0.048, ammo = 0.4, abbreviation = 'F', color = skill_point_color },
+  ['Bounce'] = { cooldown = 0.32, ammo = 4, abbreviation = 'Bn', color = default_color }
 }
 tree = {}
 tree[2] = { 'HP', { '6% Increased HP', 'hp_multiplier', 0.06 } }

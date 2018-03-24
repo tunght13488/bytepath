@@ -138,18 +138,39 @@ function Projectile:update(dt)
   Projectile.super.update(self, dt)
   self.time = self.time + dt
 
-  local spd_multiplier = 1
-  if current_room and current_room.player and (not current_room.player.dead) then
-    spd_multiplier = current_room.player.pspd_multiplier.value
+  -- Collision
+  if self.bounce and self.bounce > 0 then
+    if self.x < 0 then
+      self.r = math.pi - self.r
+      self.bounce = self.bounce - 1
+    end
+    if self.y < 0 then
+      self.r = 2 * math.pi - self.r
+      self.bounce = self.bounce - 1
+    end
+    if self.x > gw then
+      self.r = math.pi - self.r
+      self.bounce = self.bounce - 1
+    end
+    if self.y > gh then
+      self.r = 2 * math.pi - self.r
+      self.bounce = self.bounce - 1
+    end
+  else
+    if self.x < 0 then self:die() end
+    if self.y < 0 then self:die() end
+    if self.x > gw then self:die() end
+    if self.y > gh then self:die() end
   end
-
-  if self.x < 0 then self:die() end
-  if self.y < 0 then self:die() end
-  if self.x > gw then self:die() end
-  if self.y > gh then self:die() end
 
   if self.attack == 'Spread' then
     self.color = table.random(default_colors)
+  end
+
+  -- Speed multiplier
+  local spd_multiplier = 1
+  if current_room and current_room.player and (not current_room.player.dead) then
+    spd_multiplier = current_room.player.pspd_multiplier.value
   end
 
   if self.attack == 'Homing' then
@@ -200,17 +221,17 @@ function Projectile:update(dt)
   --     object:die()
   -- end
 
-  if self.attack ~= 'Homing' then
-    if self.shield then
-      self.collider:setPosition(self.parent.x + self.orbit_distance * math.cos(self.orbit_speed * self.time + self.orbit_offset),
-        self.parent.y + self.orbit_distance * math.sin(self.orbit_speed * self.time + self.orbit_offset))
-      local x, y = self.collider:getPosition()
-      local dx, dy = x - self.previous_x, y - self.previous_y
-      self.r = Vector(dx, dy):angleTo()
-      self.timer:after(6 * self.projectile_duration_multiplier, function() self:die() end)
-    end
+  -- Shield
+  if self.shield then
+    self.collider:setPosition(self.parent.x + self.orbit_distance * math.cos(self.orbit_speed * self.time + self.orbit_offset),
+      self.parent.y + self.orbit_distance * math.sin(self.orbit_speed * self.time + self.orbit_offset))
+    local x, y = self.collider:getPosition()
+    local dx, dy = x - self.previous_x, y - self.previous_y
+    self.r = Vector(dx, dy):angleTo()
+    self.timer:after(6 * self.projectile_duration_multiplier, function() self:die() end)
   end
 
+  -- Spin
   if self.attack == 'Spin' then
     self.r = self.r + self.rv * dt
     self.timer:after(random(2.4, 3.2), function() self:die() end)
@@ -228,8 +249,8 @@ end
 function Projectile:draw()
   Projectile.super.draw(self)
   if self.invisible then return end
+  pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo())
   if self.attack == 'Homing' then
-    pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo())
     -- love.graphics.setColor(self.color)
     -- draft:triangleRight(self.x, self.y, self.s, self.s, 'fill')
     -- draft:rhombus(self.x, self.y, self.s, self.s, 'fill')
@@ -244,19 +265,19 @@ function Projectile:draw()
       end)
       draft:polygon(verticles, 'fill')
     end
-    love.graphics.pop()
-    love.graphics.setColor(default_color)
   else
-    love.graphics.setColor(default_color)
-    pushRotate(self.x, self.y, Vector(self.collider:getLinearVelocity()):angleTo())
     love.graphics.setLineWidth(self.s - self.s / 4)
-    love.graphics.setColor(self.color)
+    if self.attack == 'Bounce' then
+      love.graphics.setColor(table.random(default_colors))
+    else
+      love.graphics.setColor(self.color)
+    end
     love.graphics.line(self.x - 2 * self.s, self.y, self.x, self.y)
     love.graphics.setColor(default_color)
     love.graphics.line(self.x, self.y, self.x + 2 * self.s, self.y)
-    love.graphics.setLineWidth(1)
-    love.graphics.pop()
   end
+  love.graphics.pop()
+  love.graphics.setLineWidth(1)
   love.graphics.setColor(default_color)
 end
 

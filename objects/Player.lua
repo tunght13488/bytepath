@@ -232,9 +232,9 @@ function Player:update(dt)
   end
 
   -- Toggle homing attack
-  if input:released('toggle_homing_attack') then
+  if input:released('toggle_attack') then
     if self.attack == 'Neutral' then
-      self:setAttack('Homing')
+      self:setAttack('Lightning')
     else
       self:setAttack('Neutral')
     end
@@ -377,12 +377,14 @@ function Player:shoot()
     shield = self.chances.shield_projectile_chance:next()
   }
 
-  self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
   if self.attack == 'Neutral' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), table.merge({ r = self.r }, mods))
   elseif self.attack == 'Homing' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile', self.x + 1.5 * d * math.cos(self.r), self.y + 1.5 * d * math.sin(self.r), table.merge({ r = self.r }, mods))
   elseif self.attack == 'Double' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + math.pi / 12),
       self.y + 1.5 * d * math.sin(self.r + math.pi / 12),
@@ -392,6 +394,7 @@ function Player:shoot()
       self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
       table.merge({ r = self.r - math.pi / 12 }, mods))
   elseif self.attack == 'Triple' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
@@ -405,17 +408,20 @@ function Player:shoot()
       self.y + 1.5 * d * math.sin(self.r - math.pi / 12),
       table.merge({ r = self.r - math.pi / 12 }, mods))
   elseif self.attack == 'Rapid' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r }, mods))
   elseif self.attack == 'Spread' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     local dr = random(-math.pi / 8, math.pi / 8)
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + dr),
       self.y + 1.5 * d * math.sin(self.r + dr),
       table.merge({ r = self.r + dr }, mods))
   elseif self.attack == 'Back' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
@@ -425,6 +431,7 @@ function Player:shoot()
       self.y + 1.5 * d * math.sin(self.r + math.pi),
       table.merge({ r = self.r + math.pi }, mods))
   elseif self.attack == 'Side' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
@@ -438,6 +445,7 @@ function Player:shoot()
       self.y + 1.5 * d * math.sin(self.r - math.pi / 2),
       table.merge({ r = self.r - math.pi / 2 }, mods))
   elseif self.attack == 'Blast' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     for i = 1, 12 do
       local random_angle = random(-math.pi / 6, math.pi / 6)
       self.area:addGameObject('Projectile',
@@ -447,31 +455,69 @@ function Player:shoot()
     end
     camera:shake(4, 60, 0.4)
   elseif self.attack == 'Spin' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r }, mods))
   elseif self.attack == 'Flame' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     local random_angle = random(-math.pi / 18, math.pi / 18)
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r + random_angle),
       self.y + 1.5 * d * math.sin(self.r + random_angle),
       table.merge({ r = self.r + random_angle, v = random(250, 300) }, mods))
   elseif self.attack == 'Bounce' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r, bounce = 4 }, mods))
   elseif self.attack == '2Split' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r }, mods))
   elseif self.attack == '4Split' then
+    self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
     self.area:addGameObject('Projectile',
       self.x + 1.5 * d * math.cos(self.r),
       self.y + 1.5 * d * math.sin(self.r),
       table.merge({ r = self.r }, mods))
+  elseif self.attack == 'Lightning' then
+    local x1, y1 = self.x + d * math.cos(self.r), self.y + d * math.sin(self.r)
+    local cx, cy = x1 + 24 * math.cos(self.r), y1 + 24 * math.sin(self.r)
+    -- Find closest enemy
+    local nearby_enemies = self.area:getAllGameObjectsThat(function(e)
+      for _, enemy in ipairs(enemies) do
+        if e:is(_G[enemy]) and (distance(e.x, e.y, cx, cy) < 64) then
+          return true
+        end
+      end
+    end)
+    table.sort(nearby_enemies, function(a, b)
+      return distance(a.x, a.y, cx, cy) < distance(b.x, b.y, cx, cy)
+    end)
+    local closest_enemy = nearby_enemies[1]
+    -- Attack closest enemy
+    if closest_enemy then
+      self.ammo = self.ammo - attacks[self.attack].ammo * self.ammo_consumption_multiplier
+      closest_enemy:hit()
+      local x2, y2 = closest_enemy.x, closest_enemy.y
+      self.area:addGameObject('LightningLine', 0, 0, { x1 = x1, y1 = y1, x2 = x2, y2 = y2 })
+      for i = 1, love.math.random(4, 8) do
+        self.area:addGameObject('ExplodeParticle', x1, y1,
+          { color = table.random({ default_color, boost_color }) })
+      end
+      for i = 1, love.math.random(4, 8) do
+        self.area:addGameObject('ExplodeParticle', x2, y2,
+          { color = table.random({ default_color, boost_color }) })
+      end
+      -- else
+      --   local x2, y2 = self.x + 88 * math.cos(self.r), self.y + 88 * math.sin(self.r)
+      --   self.area:addGameObject('LightningLine', 0, 0, { x1 = x1, y1 = y1, x2 = x2, y2 = y2 })
+    end
   end
 
   -- Fallback to Neutral if out of ammo

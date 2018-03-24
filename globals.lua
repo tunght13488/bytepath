@@ -26,6 +26,7 @@ attacks = {
   ['Bounce'] = { cooldown = 0.32, ammo = 4, abbreviation = 'Bn', color = default_color },
   ['2Split'] = { cooldown = 0.32, ammo = 3, abbreviation = '2S', color = ammo_color },
   ['4Split'] = { cooldown = 0.4, ammo = 4, abbreviation = '4S', color = boost_color },
+  ['Lightning'] = { cooldown = 0.2, ammo = 8, abbreviation = 'Li', color = default_color },
 }
 tree = {}
 tree[2] = { 'HP', { '6% Increased HP', 'hp_multiplier', 0.06 } }

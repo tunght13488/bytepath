@@ -15,7 +15,7 @@ function Stage:new()
   self.player = self.area:addGameObject('Player', gw / 2, gh / 2)
   self.director = Director(self)
   self.score = 0
-  self.font = fonts.kenpixel_16
+  self.font = fonts.kenpixel_14
 
   -- input:bind('p', function()
   --     -- self.area:addGameObject('Ammo', random(0, gw), random(0, gh))

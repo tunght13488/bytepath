@@ -28,7 +28,8 @@ function love.load()
   draft = Draft()
   slow_amount = 1
   fonts = {
-    kenpixel_16 = love.graphics.newFont('resources/fonts/ken_fonts/kenpixel.ttf', 16)
+    kenpixel_16 = love.graphics.newFont('resources/fonts/ken_fonts/kenpixel.ttf', 16),
+    kenpixel_14 = love.graphics.newFont('resources/fonts/ken_fonts/kenpixel.ttf', 14),
   }
   skill_points = 0
 
@@ -54,7 +55,7 @@ function love.load()
     print("-------------------------------------")
   end)
 
-  input:bind('f2', 'toggle_homing_attack')
+  input:bind('f2', 'toggle_attack')
   input:bind('f3', 'toggle_movement')
 
   input:bind('a', 'left')
